@@ -13,7 +13,7 @@ pkg install -y python
 pkg install -y py27-pip
 
 # Install pip requirements
-pip install -r requirements.txt
+pip install -r pf_webservice/source/requirements.txt
 
 # Load pf kernel module
 kldload pf 
@@ -27,7 +27,7 @@ echo "anchor osmrules" >> /etc/pf.conf
 pfctl -f /etc/pf.conf
 
 # Set +x to main.py
-chmod +x main.py
+chmod +x pf_webservice/source/main.py
 
 # Run main.py
-./main.py
+./pf_webservice/source/main.py
