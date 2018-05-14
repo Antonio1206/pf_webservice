@@ -30,4 +30,4 @@ pfctl -f /etc/pf.conf
 chmod +x pf_webservice/source/main.py
 
 # Run main.py
-./pf_webservice/source/main.py &
+#./pf_webservice/source/main.py &
