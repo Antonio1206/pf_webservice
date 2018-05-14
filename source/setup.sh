@@ -21,6 +21,11 @@ kldload pf
 # Enable PF
 pfctl -e 
 
+# Set initial config for PF
+echo "pass all" > /etc/pf.conf
+echo "anchor osmrules" >> /etc/pf.conf
+pfctl -f /etc/pf.conf load /etc/pf.conf
+
 # Set +x to main.py
 chmod +x main.py
 
