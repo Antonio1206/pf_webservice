@@ -1,6 +1,0 @@
-block return in quick proto udp from 10.0.0.10 to any
-pass out quick on eth1 proto tcp from 10.0.0.20 to any flags any keep state (max-src-states 500, max-src-conn 500)
-block return in quick proto tcp from 10.0.0.30 port = 80 to 10.0.0.0/24 port = 8080
-block drop in quick proto tcp from 10.0.0.40 to any
-ciao mamma
-block drop from any to any
