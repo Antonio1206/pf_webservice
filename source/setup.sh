@@ -6,6 +6,9 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# Install Bash on FreeBSD
+pkg install -y bash
+
 # Install python on FreeBSD
 pkg install -y python
 
