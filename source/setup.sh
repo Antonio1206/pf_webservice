@@ -9,6 +9,9 @@ fi
 # Install Bash on FreeBSD
 pkg install -y bash
 
+# Install lsof on FreeBSD
+pkg install -y lsof
+
 # Install python on FreeBSD
 pkg install -y python
 
