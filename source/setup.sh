@@ -29,7 +29,7 @@ pfctl -f /etc/pf.conf
 # Set +x to main.py
 chmod +x pf_webservice/source/main.py
 
-# Run main.py
-nohup pf_webservice/source/main.py > pf.log 2>&1 &
-echo "Web Service Started"
+# Run main
+#nohup pf_webservice/source/main.py > pf.log 2>&1 &
+#echo "Web Service Started"
 #./pf_webservice/source/main.py &
