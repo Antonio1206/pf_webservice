@@ -2,7 +2,7 @@
 
 for var in $@
 do
-echo ifconfig_$var=\"DHCP\" >> rc.conf
+echo ifconfig_$var=\"DHCP\" >> /etc/rc.conf
 done
 
 for var in $@
