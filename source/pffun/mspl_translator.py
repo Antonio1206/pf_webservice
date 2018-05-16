@@ -64,7 +64,7 @@ def xml_to_pfrule(data):
             xml_data["condition"]["packet-filter-condition"],
             "interface")
         if xml_interface is not None:
-            rule.ifname = xml_interface
+            rule.ifname = xml_interface.replace("eth","vtnet")
 
         xml_sport = getValIfKeyExists(
             xml_data["condition"]["packet-filter-condition"], "source-port")

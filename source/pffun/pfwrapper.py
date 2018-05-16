@@ -47,6 +47,7 @@ def get_json_rules():
         return None
     
 def get_rule_dict(rule):
+    quick = "False"
     src = None
     dst = None
     protocol = None
@@ -79,10 +80,13 @@ def get_rule_dict(rule):
         elif tmprule[i] == "out":
             direction = "outbound"
  
+        #Read quick keywork if exists
+        elif tmprule[i] == "quick":
+            quick = "True"
         #Read interface if exists
         elif tmprule[i] == "on":
             i += 1
-            interface = tmprule[i]        
+            interface = tmprule[i]replace("vtnet","eth")        
 
         #Read the protocol if exists
         elif tmprule[i] == "proto":
@@ -144,6 +148,7 @@ def get_rule_dict(rule):
         "action": action,
         "src": src,
         "dst": dst,
+        "quick" : quick
     }
     if direction is not None:
         json_rule['direction'] = direction
