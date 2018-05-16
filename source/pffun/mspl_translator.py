@@ -1,7 +1,7 @@
 import xmltodict
 import pf
 import socket
-#from common import settings
+from common import settings
 
 
 def xml_to_pfrule(data):
@@ -18,14 +18,13 @@ def xml_to_pfrule(data):
         xml_datas.append(xml_rules)
 
     rate_limit = None
-    #rules = []
     rules = pf.PFRuleset()
 
     for xml_data in xml_datas:
         print xml_data
         rule = pf.PFRule()
-        rule.quick = True #Always?
-        rule.keep_state = pf.PF_STATE_NORMAL #Always?
+        if settings.quick_rules == "True":
+            rule.quick = True
         Addrs = None
         Addrd = None
         Ports = None
@@ -42,7 +41,6 @@ def xml_to_pfrule(data):
         if xml_dst is not None:
             Addrd = pf.PFAddr(xml_dst)
         
-        #Convert Format?
         xml_proto = getValIfKeyExists(
             xml_data["condition"]["packet-filter-condition"],
             "protocol")
@@ -79,6 +77,7 @@ def xml_to_pfrule(data):
         if default_target is not None:
             if default_target == "ACCEPT":
                 rule.action = pf.PF_PASS
+                rule.keep_state = pf.PF_STATE_NORMAL
             elif default_target == "DROP" or default_target == "REJECT":
                 rule.action = pf.PF_DROP
                 if default_target == "REJECT":
@@ -93,16 +92,16 @@ def xml_to_pfrule(data):
             # (seconds, minutes, hours or days).
             # -m limit --limit <rate-limit> --limit-burst <limit-burst> \
             # -j ACCEPT
-            rate_limit = getValIfKeyExists(
-                xml_data["condition"]["traffic-flow-condition"],
-                "rate-limit")
+            #rate_limit = getValIfKeyExists(
+            #    xml_data["condition"]["traffic-flow-condition"],
+            #    "rate-limit")
 
             # The maximum number of connections per host.
             max_connections = getValIfKeyExists(
                 xml_data["condition"]["traffic-flow-condition"],
                 "max-connections")
-
-            if max_connections is not None:
+            # If the action is DROP or REJECT the rule will fire an error if max_src_conn is setted
+            if max_connections is not None and default_target == "ACCEPT":
                 print "Setted maxconn"
                 #rule.max_src_nodes = max_connections
                 rule.max_src_conn = max_connections
@@ -143,10 +142,8 @@ def xml_to_pfrule(data):
         elif Portd is not None:
             rule.dst = pf.PFRuleAddr(Portd) 
         # Append rule
-        print rule
         rules.append(rule)
 
-    print rules
     return rules
 
 

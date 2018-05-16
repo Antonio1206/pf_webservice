@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from pffun import pfwrapper
-import json
-import xmltodict
+from common import settings
 
 v1 = Blueprint('v1', __name__, template_folder='templates')
 
@@ -45,6 +44,28 @@ def flush_rules():
     try:
         pfwrapper.delete_rules()
         return ok_message()
+    except Exception as e:
+        print e
+        return error_message(e)
+
+@v1.route("/setQuick/v1", methods=['POST'])
+def set_quick():
+    try:
+        value = request.get_data()
+        settings.quick_rules = value
+        return ok_message()
+    except Exception as e:
+        print e
+        return error_message(e)
+
+@v1.route("/getQuick/v1", methods=['GET'])
+def get_quick():
+    try:
+        message = {
+                'status': 200,
+                'message': 'Quick rules: ' + settings.quick_rules,
+            }
+        return ok_message(message)
     except Exception as e:
         print e
         return error_message(e)
