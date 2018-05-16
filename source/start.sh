@@ -1,4 +1,13 @@
 #!/bin/sh
 
-nohup pf_webservice/source/main.py > pf.log 2>&1 &
+for var in $@
+do
+echo ifconfig_$var=\"DHCP\" >> rc.conf
+done
+
+for var in $@
+do
+ifconfig $var down
+ifconfig $var up
+done
 

@@ -86,7 +86,7 @@ def get_rule_dict(rule):
         #Read interface if exists
         elif tmprule[i] == "on":
             i += 1
-            interface = tmprule[i]replace("vtnet","eth")        
+            interface = tmprule[i].replace("vtnet","eth")        
 
         #Read the protocol if exists
         elif tmprule[i] == "proto":
