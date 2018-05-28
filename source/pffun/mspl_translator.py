@@ -44,7 +44,6 @@ def xml_to_pfrule(data):
         xml_proto = getValIfKeyExists(
             xml_data["condition"]["packet-filter-condition"],
             "protocol")
-        print xml_proto.lower()
         if xml_proto is not None:
             if xml_proto.lower() == "tcp":
                 rule.proto = socket.IPPROTO_TCP
