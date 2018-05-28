@@ -79,8 +79,9 @@ def xml_to_pfrule(data):
                 rule.keep_state = pf.PF_STATE_NORMAL
             elif default_target == "DROP" or default_target == "REJECT":
                 rule.action = pf.PF_DROP
-                if default_target == "REJECT":
-                    rule.rule_flag = pf.PFRULE_RETURN
+            elif default_target == "REJECT":
+                rule.action = pf.PF_DROP
+                rule.rule_flag = pf.PFRULE_RETURN
 
         # In case of packets/sec rate limit:
         if getValIfKeyExists(
@@ -106,23 +107,21 @@ def xml_to_pfrule(data):
                 rule.max_src_conn = max_connections
                 rule.max_src_states = max_connections
 
-        # In case of specified ports:
+        # In case of specified ports, ports can be applied only if protocol is specified:
         if xml_sport is not None:
             if xml_proto is not None:
                 if xml_proto.lower() == "tcp":
                     Ports = pf.PFPort(xml_sport, socket.IPPROTO_TCP)
                 elif xml_proto.lower() == "udp":
                     Ports = pf.PFPort(xml_sport, socket.IPPROTO_UDP)
-            elif xml_proto is None:
-                Ports = pf.PFPort(xml_sport)
+            
         if xml_dport is not None:
             if xml_proto is not None:
                 if xml_proto.lower() == "tcp":
                     Portd = pf.PFPort(xml_dport, socket.IPPROTO_TCP)
                 elif xml_proto.lower() == "udp":
                     Portd = pf.PFPort(xml_dport, socket.IPPROTO_UDP)
-            elif xml_proto is None:
-                Portd = pf.PFPort(xml_dport)
+            
 
         # TODO: Manage Priority
         priority = getValIfKeyExists(xml_data, "priority")
