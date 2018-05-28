@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Make sure only root can run our script
+# Make sure only root can run this script
 if [ "$(id -u)" != "0" ]; then
    echo "This script must be run as root" 1>&2
    exit 1
@@ -31,6 +31,10 @@ pfctl -e
 echo "pass all" > /etc/pf.conf
 echo "anchor osmrules" >> /etc/pf.conf
 pfctl -f /etc/pf.conf
+
+#Enable forwarding on FreeBSD
+sysctl net.inet.ip.forwarding=1
+sysctl net.inet6.ip6.forwarding=1
 
 # Set +x to main.py
 chmod +x pf_webservice/source/main.py
