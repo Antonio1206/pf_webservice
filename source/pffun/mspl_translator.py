@@ -77,7 +77,7 @@ def xml_to_pfrule(data):
             if default_target == "ACCEPT":
                 rule.action = pf.PF_PASS
                 rule.keep_state = pf.PF_STATE_NORMAL
-            elif default_target == "DROP" or default_target == "REJECT":
+            elif default_target == "DROP":
                 rule.action = pf.PF_DROP
             elif default_target == "REJECT":
                 rule.action = pf.PF_DROP

@@ -28,13 +28,16 @@ kldload pf
 pfctl -e 
 
 # Set initial config for PF
-echo "pass all" > /etc/pf.conf
+echo "pass all no state" > /etc/pf.conf
 echo "anchor osmrules" >> /etc/pf.conf
 pfctl -f /etc/pf.conf
 
 #Enable forwarding on FreeBSD
 sysctl net.inet.ip.forwarding=1
 sysctl net.inet6.ip6.forwarding=1
+
+#Disable tcp tso
+sysctl net.inet.tcp.tso=0
 
 # Set +x to main.py
 chmod +x pf_webservice/source/main.py
