@@ -2,7 +2,7 @@
 
 for var in $@
 do
-echo ifconfig_$var=\"DHCP\" | tee -a /etc/rc.conf > /dev/null
+echo ifconfig_$var=\"DHCP -rxcsum -txcsum\" | tee -a /etc/rc.conf > /dev/null
 done
 
 for var in $@
