@@ -9,7 +9,8 @@ for var in $@
 do
 ifconfig $var down
 ifconfig $var up
-#ifconfig $var -rxcsum
-#ifconfic $var -txcsum
+ifconfig $var -rxcsum -txcsum
 done
+
+exit 0
 
