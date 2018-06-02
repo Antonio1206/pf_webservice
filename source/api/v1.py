@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from pffun import pfwrapper
 from common import settings
+from xsd import xmlvalidator
 
 v1 = Blueprint('v1', __name__, template_folder='templates')
 
@@ -8,6 +9,7 @@ v1 = Blueprint('v1', __name__, template_folder='templates')
 def set_rules():
     try:
         payload = request.get_data()
+        xmlvalidator.validate_input(payload)
         pfwrapper.add_rules(payload)
         return ok_message()
     except Exception as e:
