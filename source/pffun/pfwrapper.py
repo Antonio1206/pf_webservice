@@ -6,7 +6,7 @@ import json
 def add_rules(payload):
     rules = mspl_translator.xml_to_pfrule(payload)
     if os.path.isfile("osmconfig"):
-        with open("checkrules","a" as check:
+        with open("checkrules","a") as check:
             check.write(str(rules))
             check.write('\n')
         try:
