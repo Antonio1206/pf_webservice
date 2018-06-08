@@ -5,8 +5,8 @@ import os
 import re
 import subprocess
 
-class Fatal(Exception):
-    pass
+#class Fatal(Exception):
+#    pass
 
 def pfctl(args, stdin=None):
     argv = ['pfctl'] + list(args.split(" "))
@@ -16,7 +16,7 @@ def pfctl(args, stdin=None):
                          stderr=subprocess.PIPE)
     o = p.communicate(stdin)
     if p.returncode:
-        print Fatal('%r returned %d' % (argv, p.returncode))
+        raise Exception('%r returned %d' % (argv, p.returncode))
     return o
 
 def PFenable():

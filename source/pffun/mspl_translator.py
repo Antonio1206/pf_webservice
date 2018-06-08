@@ -82,6 +82,8 @@ def xml_to_pfrule(data):
             elif default_target == "REJECT":
                 rule.action = pf.PF_DROP
                 rule.rule_flag = pf.PFRULE_RETURN
+            elif default_target == "SCRUB":
+                rule.action = pf.PF_SCRUB
 
         # In case of packets/sec rate limit:
         if getValIfKeyExists(
@@ -102,10 +104,22 @@ def xml_to_pfrule(data):
                 "max-connections")
             # If the action is DROP or REJECT the rule will fire an error if max_src_conn is setted
             if max_connections is not None and default_target == "ACCEPT":
-                print "Setted maxconn"
                 #rule.max_src_nodes = max_connections
                 rule.max_src_conn = max_connections
-                rule.max_src_states = max_connections
+                rule.rule_flag = pf.PFRULE_SRCTRACK
+            
+            # Connections rate limit
+            connections_rate = getValIfKeyExists(
+                xml_data["condition"]["traffic-flow-condition"],
+                "connections-rate")
+            # If the action is DROP or REJECT the rule will fire an error if max_src_conn_rate is setted
+            if connections_rate is not None and default_target == "ACCEPT":
+                splitted = connections_rate.split('/')
+                #rule.max_src_nodes = max_connections
+                limit = splitted[0]
+                seconds = splitted[1]
+                rule.max_src_conn_rate = (limit,seconds)
+                rule.rule_flag = pf.PFRULE_SRCTRACK
 
         # In case of specified ports, ports can be applied only if protocol is specified:
         if xml_sport is not None:
@@ -114,6 +128,8 @@ def xml_to_pfrule(data):
                     Ports = pf.PFPort(xml_sport, socket.IPPROTO_TCP)
                 elif xml_proto.lower() == "udp":
                     Ports = pf.PFPort(xml_sport, socket.IPPROTO_UDP)
+            else:
+                Ports = pf.PFPort(xml_sport)
             
         if xml_dport is not None:
             if xml_proto is not None:
@@ -121,6 +137,9 @@ def xml_to_pfrule(data):
                     Portd = pf.PFPort(xml_dport, socket.IPPROTO_TCP)
                 elif xml_proto.lower() == "udp":
                     Portd = pf.PFPort(xml_dport, socket.IPPROTO_UDP)
+            else:
+                print xml_dport
+                Portd = pf.PFPort(xml_dport)
             
 
         # TODO: Manage Priority
@@ -131,14 +150,14 @@ def xml_to_pfrule(data):
         elif Addrs is not None:
             rule.src = pf.PFRuleAddr(Addrs)
         elif Ports is not None:
-            rule.src = pf.PFRuleAddr(Ports)
+            rule.src = pf.PFRuleAddr(pf.PFAddr(),Ports)
 
         if Addrd is not None and Portd is not None:
             rule.dst = pf.PFRuleAddr(Addrd, Portd)
         elif Addrd is not None:
             rule.dst = pf.PFRuleAddr(Addrd)
         elif Portd is not None:
-            rule.dst = pf.PFRuleAddr(Portd) 
+            rule.dst = pf.PFRuleAddr(pf.PFAddr(),Portd) 
         # Append rule
         rules.append(rule)
 

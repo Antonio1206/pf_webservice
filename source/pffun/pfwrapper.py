@@ -6,13 +6,22 @@ import json
 def add_rules(payload):
     rules = mspl_translator.xml_to_pfrule(payload)
     if os.path.isfile("osmconfig"):
+        with open("checkrules","a" as check:
+            check.write(str(rules))
+            check.write('\n')
+        try:
+            pfctl("-n -f checkrules")
+        except Exception as error:
+            os.remove("checkrules")
+            raise Exception("Unable to add rules due to rules integrity error")
+        os.remove("checkrules")
         with open("osmconfig","a") as f:
             f.write(str(rules))
             f.write('\n')
     else:
         with open("osmconfig","w") as newf:
             newf.write(str(rules))
-            newf.write('\n')
+            newf.write('\n')   
     pffunction.pfctl("-a osmrules -f osmconfig")
 
 def delete_rules():
@@ -41,7 +50,7 @@ def get_json_rules():
                if json_rule is not None:
                    json_result[i] = json_rule
                    i += 1
-        #return json.dumps(json_result)
+        
         return json_result    
     else:
         return None
@@ -57,6 +66,7 @@ def get_rule_dict(rule):
     direction = None
     connlimit = None
     action = None
+    connrate = None
     policy_found = False
     tmprule = rule.split(" ")
     i = 0
@@ -73,7 +83,10 @@ def get_rule_dict(rule):
                 action = "drop"
             else:
                 action = "reject"
-        
+        elif tmprule[i] == "scrub":
+            action = "scrub"
+            policy_found = True
+
         #Read the direction if exists
         elif tmprule[i] == "in":
             direction = "inbound"
@@ -135,6 +148,11 @@ def get_rule_dict(rule):
         elif tmprule[i] == "max-src-conn":
             i += 1
             connlimit = tmprule[i].strip(")\n")
+        
+        #Read connections-limit if exists
+        elif tmprule[i] == "max-src-conn-rate":
+            i += 1
+            connrate = tmprule[i].strip(")\n")
         #Increment i and continue the cycle
         i += 1
     
@@ -161,6 +179,8 @@ def get_rule_dict(rule):
     if dport is not None:
         json_rule['destination-port'] = dport
     if connlimit is not None:
-        json_rule['max connections'] = connlimit    
+        json_rule['max connections'] = connlimit
+    if connrate is not None:
+        json_rule['connections rate'] = connrate    
 
     return json_rule
