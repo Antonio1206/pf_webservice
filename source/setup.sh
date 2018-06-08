@@ -19,7 +19,7 @@ pkg install -y python
 pkg install -y py27-pip
 
 #Install lxml on FreeBSD for xml validation
-pkg install py27-lxml
+pkg install -y py27-lxml
 
 # Install pip requirements
 pip install -r pf_webservice/source/requirements.txt
