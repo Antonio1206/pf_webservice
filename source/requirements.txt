@@ -1,4 +1,3 @@
 flask
 xmltodict
 py-pf
-lxml
