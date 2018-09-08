@@ -6,7 +6,6 @@ import sys
 import re
 
 
-
 app = Flask(__name__)
 app.register_blueprint(v1)
 

@@ -5,8 +5,9 @@ import os
 import re
 import subprocess
 
-#class Fatal(Exception):
+# class Fatal(Exception):
 #    pass
+
 
 def pfctl(args, stdin=None):
     argv = ['pfctl'] + list(args.split(" "))
@@ -19,9 +20,10 @@ def pfctl(args, stdin=None):
         raise Exception('%r returned %d' % (argv, p.returncode))
     return o
 
+
 def PFenable():
     pfctl("-e")
 
+
 def PFdisable():
     pfctl("-d")
-

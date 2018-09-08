@@ -10,16 +10,15 @@ def xml_to_pfrule(data):
     xml_datas = []
     xml_rules = xmltodict.parse(
         data,
-        dict_constructor=dict)["mspl-set"]["it-resource"]["configuration"]["rule"]
+        dict_constructor=dict
+    )["mspl-set"]["it-resource"]["configuration"]["rule"]
     if isinstance(xml_rules, list):
         for xml_rule in xml_rules:
             xml_datas.append(xml_rule)
     else:
         xml_datas.append(xml_rules)
-
     rate_limit = None
     rules = pf.PFRuleset()
-
     for xml_data in xml_datas:
         print xml_data
         rule = pf.PFRule()
@@ -29,18 +28,15 @@ def xml_to_pfrule(data):
         Addrd = None
         Ports = None
         Portd = None
-        
         xml_src = getValIfKeyExists(
             xml_data["condition"]["packet-filter-condition"], "source-address")
         if xml_src is not None:
             Addrs = pf.PFAddr(xml_src)
-
         xml_dst = getValIfKeyExists(
             xml_data["condition"]["packet-filter-condition"],
             "destination-address")
         if xml_dst is not None:
             Addrd = pf.PFAddr(xml_dst)
-        
         xml_proto = getValIfKeyExists(
             xml_data["condition"]["packet-filter-condition"],
             "protocol")
@@ -49,7 +45,6 @@ def xml_to_pfrule(data):
                 rule.proto = socket.IPPROTO_TCP
             elif xml_proto.lower() == "udp":
                 rule.proto = socket.IPPROTO_UDP
- 
         xml_direction = getValIfKeyExists(
             xml_data["condition"]["packet-filter-condition"],
             "direction")
@@ -58,19 +53,16 @@ def xml_to_pfrule(data):
                 rule.direction = pf.PF_IN
             elif xml_direction.lower() == "outbound":
                 rule.direction = pf.PF_OUT
-        
         xml_interface = getValIfKeyExists(
             xml_data["condition"]["packet-filter-condition"],
             "interface")
         if xml_interface is not None:
-            rule.ifname = xml_interface.replace("eth","vtnet")
-
+            rule.ifname = xml_interface.replace("eth", "vtnet")
         xml_sport = getValIfKeyExists(
             xml_data["condition"]["packet-filter-condition"], "source-port")
         xml_dport = getValIfKeyExists(
             xml_data["condition"]["packet-filter-condition"],
             "destination-port")
-        
         # Retrieve default target from MSPL
         default_target = getValIfKeyExists(xml_data, "action").upper()
         if default_target is not None:
@@ -84,17 +76,15 @@ def xml_to_pfrule(data):
                 rule.rule_flag = pf.PFRULE_RETURN
             elif default_target == "SCRUB":
                 rule.action = pf.PF_SCRUB
-
         # In case of packets/sec rate limit:
         if getValIfKeyExists(
                 xml_data["condition"],
                 "traffic-flow-condition") is not None:
-
             # It is a number of allowed packets or bits per unit of time
             # (seconds, minutes, hours or days).
             # -m limit --limit <rate-limit> --limit-burst <limit-burst> \
             # -j ACCEPT
-            #rate_limit = getValIfKeyExists(
+            # rate_limit = getValIfKeyExists(
             #    xml_data["condition"]["traffic-flow-condition"],
             #    "rate-limit")
 
@@ -102,26 +92,27 @@ def xml_to_pfrule(data):
             max_connections = getValIfKeyExists(
                 xml_data["condition"]["traffic-flow-condition"],
                 "max-connections")
-            # If the action is DROP or REJECT the rule will fire an error if max_src_conn is setted
+            # If the action is DROP or REJECT the rule will fire an error
+            # if max_src_conn is setted
             if max_connections is not None and default_target == "ACCEPT":
-                #rule.max_src_nodes = max_connections
+                # rule.max_src_nodes = max_connections
                 rule.max_src_conn = max_connections
                 rule.rule_flag = pf.PFRULE_SRCTRACK
-            
             # Connections rate limit
             connections_rate = getValIfKeyExists(
                 xml_data["condition"]["traffic-flow-condition"],
                 "connections-rate")
-            # If the action is DROP or REJECT the rule will fire an error if max_src_conn_rate is setted
+            # If the action is DROP or REJECT the rule will fire an error
+            # if max_src_conn_rate is setted
             if connections_rate is not None and default_target == "ACCEPT":
                 splitted = connections_rate.split('/')
-                #rule.max_src_nodes = max_connections
+                # rule.max_src_nodes = max_connections
                 limit = splitted[0]
                 seconds = splitted[1]
-                rule.max_src_conn_rate = (limit,seconds)
+                rule.max_src_conn_rate = (limit, seconds)
                 rule.rule_flag = pf.PFRULE_SRCTRACK
-
-        # In case of specified ports, ports can be applied only if protocol is specified:
+        # In case of specified ports, ports can be applied only
+        # if protocol is specified:
         if xml_sport is not None:
             if xml_proto is not None:
                 if xml_proto.lower() == "tcp":
@@ -130,7 +121,6 @@ def xml_to_pfrule(data):
                     Ports = pf.PFPort(xml_sport, socket.IPPROTO_UDP)
             else:
                 Ports = pf.PFPort(xml_sport)
-            
         if xml_dport is not None:
             if xml_proto is not None:
                 if xml_proto.lower() == "tcp":
@@ -140,34 +130,29 @@ def xml_to_pfrule(data):
             else:
                 print xml_dport
                 Portd = pf.PFPort(xml_dport)
-            
-
         # TODO: Manage Priority
         priority = getValIfKeyExists(xml_data, "priority")
-        
         if Addrs is not None and Ports is not None:
             rule.src = pf.PFRuleAddr(Addrs, Ports)
         elif Addrs is not None:
             rule.src = pf.PFRuleAddr(Addrs)
         elif Ports is not None:
-            rule.src = pf.PFRuleAddr(pf.PFAddr(),Ports)
-
+            rule.src = pf.PFRuleAddr(pf.PFAddr(), Ports)
         if Addrd is not None and Portd is not None:
             rule.dst = pf.PFRuleAddr(Addrd, Portd)
         elif Addrd is not None:
             rule.dst = pf.PFRuleAddr(Addrd)
         elif Portd is not None:
-            rule.dst = pf.PFRuleAddr(pf.PFAddr(),Portd) 
+            rule.dst = pf.PFRuleAddr(pf.PFAddr(), Portd)
         # Append rule
         rules.append(rule)
-
     return rules
 
 
 def getValIfKeyExists(dict_var, key_var):
     if key_var in dict_var:
         return dict_var[key_var]
-    else: 
+    else:
         if key_var[-5:] == "_list":
             return []
         else:

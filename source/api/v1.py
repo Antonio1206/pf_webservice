@@ -5,6 +5,7 @@ from xsd import xmlvalidator
 
 v1 = Blueprint('v1', __name__, template_folder='templates')
 
+
 @v1.route("/setRules/v1", methods=['POST'])
 def set_rules():
     try:
@@ -15,6 +16,7 @@ def set_rules():
     except Exception as e:
         print e
         return error_message(e)
+
 
 @v1.route("/getRules/v1", methods=['GET'])
 def get_rules():
@@ -32,6 +34,7 @@ def get_rules():
         print e
         return error_message(e)
 
+
 @v1.route("/flushRule/v1/<rule_id>", methods=['DELETE'])
 def flush_rule(rule_id):
     try:
@@ -41,6 +44,7 @@ def flush_rule(rule_id):
         print e
         return error_message(e)
 
+
 @v1.route("/flushRules/v1", methods=['DELETE'])
 def flush_rules():
     try:
@@ -49,6 +53,7 @@ def flush_rules():
     except Exception as e:
         print e
         return error_message(e)
+
 
 @v1.route("/setQuick/v1", methods=['POST'])
 def set_quick():
@@ -60,34 +65,37 @@ def set_quick():
         print e
         return error_message(e)
 
+
 @v1.route("/getQuick/v1", methods=['GET'])
 def get_quick():
     try:
         message = {
-                'status': 200,
-                'message': 'Quick rules: ' + settings.quick_rules,
+            'status': 200,
+            'message': 'Quick rules: ' + settings.quick_rules,
             }
         return ok_message(message)
     except Exception as e:
         print e
         return error_message(e)
 
+
 def error_message(error=None):
     message = {
-            'status': 500,
-            'message': 'Internal server error: ' + str(error),
-    }
+        'status': 500,
+        'message': 'Internal server error: ' + str(error),
+        }
     resp = jsonify(message)
     resp.status_code = 500
 
     return resp
 
+
 def ok_message(data=None):
     if data is None:
         message = {
-                'status': 200,
-                'message': 'OK',
-        }
+            'status': 200,
+            'message': 'OK',
+            }
         resp = jsonify(message)
     else:
         resp = jsonify(data)
