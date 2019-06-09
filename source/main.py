@@ -10,5 +10,10 @@ app = Flask(__name__)
 app.register_blueprint(v1)
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run(host='0.0.0.0', port=9999, threaded=True)
+    port = 9999
+    if len(sys.argv) == 2:
+        try:
+            port = int(sys.argv[1])
+        except:
+            port = 9999
+    app.run(host='0.0.0.0', port=port, threaded=True)
