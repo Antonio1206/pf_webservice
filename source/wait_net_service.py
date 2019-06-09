@@ -1,3 +1,5 @@
+import sys
+
 def wait_net_service(server, port, timeout=None):
     """ Wait for network service to appear 
         @param timeout: in seconds, if None or 0 wait forever
@@ -38,4 +40,11 @@ def wait_net_service(server, port, timeout=None):
             s.close()
             return True
 
-wait_net_service("127.0.0.1", 9999)
+if __name__ == '__main__':
+    port = 9999
+    if len(sys.argv) == 2:
+        try:
+            port = int(sys.argv[1])
+        except:
+            port = 9999
+    wait_net_service("127.0.0.1", port)
