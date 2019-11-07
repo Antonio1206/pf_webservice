@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 from flask import Flask, request
 from api.v1 import v1

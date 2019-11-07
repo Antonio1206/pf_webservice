@@ -15,9 +15,16 @@ def wait_net_service(server, port, timeout=None):
         from time import time as now
         # time module is needed to calc timeout shared between two exceptions
         end = now() + timeout
+    
+    attempt = 0
 
     while True:
         try:
+            if attempt == 3:
+                return True;
+
+            attempt = attempt + 1
+
             if timeout:
                 next_timeout = end - now()
                 if next_timeout < 0:

@@ -11,7 +11,7 @@ def add_rules(payload):
             check.write(str(rules))
             check.write('\n')
         try:
-            pfctl("-n -f checkrules")
+            pffunction.pfctl("-n -f checkrules")
         except Exception as error:
             os.remove("checkrules")
             raise Exception("Unable to add rules due to rules integrity error")
